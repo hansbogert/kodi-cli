@@ -13,13 +13,9 @@
 ## using the command found at http://forum.kodi.tv/showthread.php?tid=176795
 
 
-## Configure your KODI RPC details here
+## Configure your KODI RPC details in kodi.env
 #set -x
-
-KODI_HOST=127.0.0.1
-KODI_PORT=8080
-KODI_USER=
-KODI_PASS=
+source kodi.env
 LOCK=false
 
 function xbmc_req {
