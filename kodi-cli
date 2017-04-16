@@ -27,13 +27,13 @@ function xbmc_req {
 
   if [[ $2 = true ]];
   then
-	  echo $output
+	  echo "$output"
   fi
 }
 
 function parse_json {
  key=$1
- awk -F"[,:}]" '{for(i=1;i<=NF;i++){if($i~/'$key'\042/){print $(i+1)}}}' | tr -d '"'
+ awk -F"[,:}]" '{for(i=1;i<=NF;i++){if($i~/'"$key"'\042/){print $(i+1)}}}' | tr -d '"'
 }
 
 function play_youtube {
@@ -58,7 +58,7 @@ function play_youtube {
   xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Clear", "params":{"playlistid":1}, "id": 1}';
 
   # add the video to the list
-  xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Add", "params":{"playlistid":1, "item" :{ "file" : "plugin://plugin.video.youtube/?action=play_video&videoid='$ID'"}}, "id" : 1}';
+  xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Add", "params":{"playlistid":1, "item" :{ "file" : "plugin://plugin.video.youtube/?action=play_video&videoid='"${ID}"'"}}, "id" : 1}';
 
   # open the video
   xbmc_req '{"jsonrpc": "2.0", "method": "Player.Open", "params":{"item":{"playlistid":1, "position" : 0}}, "id": 1}';
@@ -83,11 +83,11 @@ function queue_yt_videos {
   fi
 
   output=`xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.GetItems", "params":{"playlistid":1}, "id": 99}' true`
-  numberitems=`echo $output | parse_json "total"`
+  numberitems=`echo "$output" | parse_json "total"`
 
   echo -n "Video added to the current playlist $ID on $KODI_HOST which has ($numberitems) items..."
   # add the video to the list
-  xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Add", "params":{"playlistid":1, "item" :{ "file" : "plugin://plugin.video.youtube/?action=play_video&videoid='$ID'"}}, "id" : 1}';
+  xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Add", "params":{"playlistid":1, "item" :{ "file" : "plugin://plugin.video.youtube/?action=play_video&videoid='"$ID"'"}}, "id" : 1}';
 
   echo " done."
 }
@@ -95,22 +95,22 @@ function queue_yt_videos {
 function play_pause {
   # Get Active players first
   output=`xbmc_req '{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 99}' true`
-  player_id=`echo $output | parse_json "playerid"`
+  player_id=`echo "$output" | parse_json "playerid"`
   echo "Pausing/Playing the player with ID => $player_id"
-  xbmc_req '{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid": '$player_id' }, "id": 1}'
+  xbmc_req '{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid": '"$player_id"' }, "id": 1}'
 }
 
 function stop {
   # Get Active players first
   output=`xbmc_req '{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 99}' true`
-  player_id=`echo $output | parse_json "playerid"`
+  player_id=`echo "$output" | parse_json "playerid"`
   echo "Stopping the player with ID => $player_id"
-  xbmc_req '{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid": '$player_id' }, "id": 1}'
+  xbmc_req '{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid": '"$player_id"' }, "id": 1}'
 }
 
 function send_text {
   echo "Sending the text"
-  xbmc_req '{"jsonrpc": "2.0", "method": "Input.SendText", "params": { "text": "'$1'" }}'
+  xbmc_req '{"jsonrpc": "2.0", "method": "Input.SendText", "params": { "text": "'"$1"'" }}'
 }
 
 function press_key {
@@ -182,7 +182,7 @@ function volume_down {
 function fullscreen_toggle {
   # Get Active players first
   output=`xbmc_req '{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 99}' true`
-  player_id=`echo $output | parse_json "playerid"`
+  player_id=`echo "$output" | parse_json "playerid"`
   echo "Toggle fullscreen on the player with ID => $player_id"
   xbmc_req '{ "jsonrpc": "2.0", "method": "GUI.SetFullscreen", "params": { "fullscreen": "toggle" }, "id": 1 }'
 }
@@ -210,16 +210,16 @@ while getopts "yqopstiudfh" opt; do
         case $opt in
 		y)
 			#play youtube video
-			play_youtube $2
+			play_youtube "$2"
                         ;;
 		q)
 			#queue youtube video
-			queue_yt_videos $2
+			queue_yt_videos "$2"
                         ;;
 		o)
 			#play youtube video directly
 			#this depends on using mps-youtube
-			play_youtube `mpsyt /$2, i 1, q | grep -i link | awk -F 'v=' '{ print $2 }'`
+			play_youtube `mpsyt /"$2", i 1, q | grep -i link | awk -F 'v=' '{ print $2 }'`
                         ;;
                 p)
 			play_pause
@@ -227,7 +227,7 @@ while getopts "yqopstiudfh" opt; do
 		s)
 			stop
 			;;
-		t)	send_text $2
+		t)	send_text "$2"
 			handle_keys
 			;;
 		i)
