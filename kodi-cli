@@ -32,6 +32,19 @@ function parse_json {
  awk -F"[,:}]" '{for(i=1;i<=NF;i++){if($i~/'"$key"'\042/){print $(i+1)}}}' | tr -d '"'
 }
 
+function play_url {
+  URL=$1
+
+  # clear the list
+  xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Clear", "params":{"playlistid":1}, "id": 1}';
+
+  # Add URL
+  xbmc_req '{"jsonrpc": "2.0", "method": "Playlist.Add", "params":{"playlistid":1, "item" :{ "file" : "'$URL'"}}, "id": 1}';
+
+  # open the video
+  xbmc_req '{"jsonrpc": "2.0", "method": "Player.Open", "params":{"item":{"playlistid":1, "position" : 0}}, "id": 1}';
+}
+
 function play_youtube {
 
   REGEX="^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*"
@@ -202,8 +215,11 @@ echo -e "\n kodi-cli -[p|i|h|s|y youtbe URL/ID|t 'text to send']\n\n" \
 }
 
 ## Process command line arguments
-while getopts "yqopstiudfh" opt; do
+while getopts "vyqopstiudfh" opt; do
         case $opt in
+		v)
+			play_url "$2"
+			;;
 		y)
 			#play youtube video
 			play_youtube "$2"
