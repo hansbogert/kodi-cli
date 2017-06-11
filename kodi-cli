@@ -15,7 +15,7 @@
 
 ## Configure your KODI RPC details in kodi.env
 #set -x
-source kodi.env
+source ~/.kodi-cli
 LOCK=false
 
 function xbmc_req {
