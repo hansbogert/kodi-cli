@@ -201,6 +201,7 @@ function show_help {
 echo -e "\n kodi-cli -[p|i|h|s|y youtbe URL/ID|t 'text to send']\n\n" \
 	"-p Play/Pause the current played video\n" \
 	"-s Stop the current played video\n" \
+	"-U play URL" \
 	"-y play youtube video. Use either URL/ID (of video)\n" \
 	"-q queue youtube video to the current list. Use either URL/ID (of video). Use instead of -y.\n" \
 	"-o play youtube video directly on Kodi. Use the name of video.\n" \
@@ -215,9 +216,10 @@ echo -e "\n kodi-cli -[p|i|h|s|y youtbe URL/ID|t 'text to send']\n\n" \
 }
 
 ## Process command line arguments
-while getopts "vyqopstiudfh" opt; do
+while getopts "Uyqopstiudfh" opt; do
         case $opt in
-		v)
+		U)
+			#play a URL
 			play_url "$2"
 			;;
 		y)
