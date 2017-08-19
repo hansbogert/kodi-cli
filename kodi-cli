@@ -216,24 +216,27 @@ echo -e "\n kodi-cli -[p|i|h|s|y youtbe URL/ID|t 'text to send']\n\n" \
 }
 
 ## Process command line arguments
-while getopts "Uyqopstiudfh" opt; do
+while getopts "U:c:y:q:o:pst:iudfh" opt; do
         case $opt in
 		U)
 			#play a URL
-			play_url "$2"
+			play_url "$OPTARG"
 			;;
+                c)
+                        source "$OPTARG"
+                        ;;
 		y)
 			#play youtube video
-			play_youtube "$2"
+			play_youtube "$OPTARG"
                         ;;
 		q)
 			#queue youtube video
-			queue_yt_videos "$2"
+			queue_yt_videos "$OPTARG"
                         ;;
 		o)
 			#play youtube video directly
 			#this depends on using mps-youtube
-			play_youtube $(mpsyt /"$2", i 1, q | grep -i link | awk -F 'v=' '{ print $2 }')
+			play_youtube $(mpsyt /"$OPTARG", i 1, q | grep -i link | awk -F 'v=' '{ print $OPTARG }')
                         ;;
                 p)
 			play_pause
@@ -241,7 +244,7 @@ while getopts "Uyqopstiudfh" opt; do
 		s)
 			stop
 			;;
-		t)	send_text "$2"
+		t)	send_text "$OPTARG"
 			handle_keys
 			;;
 		i)
